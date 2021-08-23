@@ -3,7 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import math
-import time
+import time 
+
 
 def get_n_params(model):
     pp=0
@@ -94,7 +95,7 @@ def forward_pass(model, data_gen, batch_size, quantiles, indexer = None, gpu = T
     if(type(data_gen) != type([])):
         data_gen = [data_gen]
     n_coins = len(data_gen)
-    
+     
     if(gpu):
         dtype = torch.cuda.FloatTensor
     else:
@@ -125,8 +126,9 @@ def forward_pass(model, data_gen, batch_size, quantiles, indexer = None, gpu = T
     mask = torch.tensor(mask).type(dtype).unsqueeze(-1)
     
     #forward pass
-    net_out, vs_weights, _ = model(in_seq_continuous, in_seq_discrete, None,
-                                future_in_seq_discrete, static, mask, n_coins = n_coins)
+#     net_out, vs_weights, _ = model(in_seq_continuous, in_seq_discrete, None,future_in_seq_discrete, static, mask, n_coins = n_coins)
+#     net_out, vs_weights, _ = model(in_seq_continuous, in_seq_discrete, None,future_in_seq_discrete, static, n_coins)
+    net_out, vs_weights, _ = model(in_seq_continuous, in_seq_discrete, None,future_in_seq_discrete, static)
     
     if loss:
         loss = torch.mean(QuantileLoss(net_out, target_seq ,quantiles), dim = -1)

@@ -93,11 +93,20 @@ def get_batches(data_, in_seq_len, out_seq_len, con_cols, disc_cols, target_cols
     if normalise:
         if norm is None:
             norm = data
+        # Normalize continuous values
+        # Open       129.16000
+        # High       129.19000
+        # Low        128.80000
+        # Close      128.88000
+        # Volume     696.71412  => Mean: 845.8115260519469, Std: 2031.3118780509599
         data[con_cols] = (data[con_cols] - norm[con_cols].stack().mean()) / norm[con_cols].stack().std()
     
     #convert columns indices from dataframe to numpy darray
+    # [2, 3, 4, 5, 6]
     con_cols = [data.columns.get_loc(x) for x in con_cols]
+    # [7, 8, 9]
     disc_cols = [data.columns.get_loc(x) for x in disc_cols]
+    # [5]
     target_cols = [data.columns.get_loc(x) for x in target_cols]
     
     if(not gpu):
@@ -107,7 +116,8 @@ def get_batches(data_, in_seq_len, out_seq_len, con_cols, disc_cols, target_cols
         
     while True:
         #get batches
-        n = np.array([pd.np.r_[i:(i + in_seq_len + out_seq_len)] for i in indexer.indices])
+#         n = np.array([pd.np.r_[i:(i + in_seq_len + out_seq_len)] for i in indexer.indices])
+        n = np.array([np.r_[i:(i + in_seq_len + out_seq_len)] for i in indexer.indices])
         batch_data = data.iloc[n.flatten()].values
         batch_data = torch.tensor(batch_data.reshape(batch_size ,in_seq_len + out_seq_len, data.shape[-1]))
         
